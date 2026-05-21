@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  component-check:
+    name: Check / Components
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout module
+        uses: actions/checkout@v4
+        with:
+          path: module
+
+      - name: Checkout meowctl
+        uses: actions/checkout@v4
+        with:
+          repository: meowshed/meowctl
+          path: meowctl
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: meowctl/go.mod
+          cache-dependency-path: meowctl/go.sum
+
+      - name: Build meowctl
+        working-directory: meowctl
+        run: CGO_ENABLED=0 go build -o meowctl ./cmd/meowctl
+
+      - name: Check component
+        run: meowctl/meowctl check module
+
+  secrets:
+    name: Secrets (trufflehog)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@7dc056a193116ba8d82154bf0549381c8fb8545c # v3.88.14
+        with:
+          extra_args: --results=verified,unknown

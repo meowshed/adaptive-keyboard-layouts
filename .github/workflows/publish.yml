@@ -1,0 +1,57 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish tarball
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Pack tarball
+        run: |
+          tar -czf "adaptive-keyboard-layouts-${{ steps.version.outputs.version }}.tar.gz" \
+            --exclude='.git' \
+            --exclude='.github' \
+            MODULE.meow adaptive-keyboard-layouts.star AdaptiveKeyboardLayouts.spoon/
+
+      - name: Compute SRI hash
+        id: sri
+        run: |
+          hash=$(openssl dgst -sha384 -binary "adaptive-keyboard-layouts-${{ steps.version.outputs.version }}.tar.gz" | openssl base64 -A)
+          echo "integrity=sha384-${hash}" >> "$GITHUB_OUTPUT"
+          echo "### SRI integrity" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "integrity = \"sha384-${hash}\"" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "Paste this into \`meowctl-registry/index.toml\` for version ${{ steps.version.outputs.version }}." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191 # v2.2.1
+        with:
+          name: "adaptive-keyboard-layouts ${{ github.ref_name }}"
+          body: |
+            ## adaptive-keyboard-layouts ${{ github.ref_name }}
+
+            ### Registry entry
+
+            Add to `meowctl-registry/index.toml`:
+
+            ```toml
+            [modules.adaptive-keyboard-layouts]
+            versions   = ["${{ steps.version.outputs.version }}"]
+            source     = "https://github.com/meowshed/adaptive-keyboard-layouts/releases/download/v{version}/adaptive-keyboard-layouts-{version}.tar.gz"
+            integrity  = "${{ steps.sri.outputs.integrity }}"
+            ```
+          files: "adaptive-keyboard-layouts-${{ steps.version.outputs.version }}.tar.gz"

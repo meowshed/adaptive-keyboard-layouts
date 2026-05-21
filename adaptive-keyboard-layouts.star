@@ -1,4 +1,4 @@
-# adaptive_keyboard_layouts.star
+# adaptive-keyboard-layouts.star
 #
 # platforms: ["macos"]
 # after:     ["@stdlib//components/hammerspoon"]
