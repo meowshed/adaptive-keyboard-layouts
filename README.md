@@ -4,9 +4,9 @@ A [meowctl](https://github.com/meowshed/meowctl) registry module — Hammerspoon
 
 ## What it does
 
-- Detects USB keyboards (e.g., Das Keyboard) and switches to Dvorak
-- Detects Bluetooth keyboards (e.g., Nuphy Air75) and switches to Dvorak
-- Falls back to ABC layout when no external keyboard is connected
+- Detects connected keyboard (USB or Bluetooth) and switches macOS input sources to match
+- Switches between Russian, US, and European keyboard layouts based on the detected keyboard
+- Falls back to default layout when no external keyboard is connected
 - Uses macOS Input Sources API via Hammerspoon
 
 ## Requirements
