@@ -24,7 +24,7 @@ jobs:
           tar -czf "adaptive-keyboard-layouts-${{ steps.version.outputs.version }}.tar.gz" \
             --exclude='.git' \
             --exclude='.github' \
-            MODULE.meow adaptive-keyboard-layouts/ AdaptiveKeyboardLayouts.spoon/
+            MODULE.meow init.star AdaptiveKeyboardLayouts.spoon/
 
       - name: Compute SRI hash
         id: sri
