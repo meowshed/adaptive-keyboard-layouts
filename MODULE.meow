@@ -1,2 +1,2 @@
-module(name = "adaptive-keyboard-layouts", version = "0.2.1", compat = 2)
-dep(name = "stdlib", version = "0.2.3")
+module(name = "adaptive-keyboard-layouts", version = "0.2.2", compat = 2)
+dep(name = "stdlib", version = "0.2.4")
